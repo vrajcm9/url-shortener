@@ -12,26 +12,40 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
 
-app.get('*', async (req, res) => {
-    const shortURLs = await ShortURL.find()
-    res.render('index', { shortURLs: shortURLs });
+app.get('/', async (req, res) => {
+    try {
+        const shortURLs = await ShortURL.find();
+        res.render('index', { shortURLs: shortURLs });
+    }
+    catch(err) {
+        res.sendStatus(404);
+    }
 });
 
 app.get('/:shortURL', async (req, res) => {
-    const shortURL = await ShortURL.findOne({ shortURL: req.params.shortURL })
-    if(shortURL == null) return  res.sendStatus(404)
+    try{    
+        const shortURL = await ShortURL.findOne({ shortURL: req.params.shortURL })
 
-    shortURL.previousHourVisits++;
-    shortURL.totalVisits++;
-    shortURL.save();
+        shortURL.previousHourVisits++;
+        shortURL.totalVisits++;
+        await shortURL.save();
 
-    res.redirect(shortURL.fullURL);
+        res.redirect(shortURL.fullURL);
+    }
+    catch(err) {
+        res.sendStatus(404);
+    }
 })
 
 app.post('/shortURLs', async (req, res) => {
-    const shortURL = await ShortURL.create({ fullURL: req.body.fullURL });
+    try {
+        const shortURL = await ShortURL.create({ fullURL: req.body.fullURL });
 
-    res.redirect('/');
+        res.redirect('/');
+    }
+    catch (err) {
+        res.sendStatus(404);
+    }
 })
 
 app.listen(process.env.PORT || 5000);
