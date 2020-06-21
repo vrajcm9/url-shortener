@@ -8,6 +8,7 @@ mongoose.connect('mongodb://localhost/URLShortener', {
     useNewUrlParser: true, useUnifiedTopology: true
 });
 
+app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
 
@@ -30,7 +31,7 @@ app.get('/:shortURL', async (req, res) => {
 app.post('/shortURLs', async (req, res) => {
     const shortURL = await ShortURL.create({ fullURL: req.body.fullURL });
 
-    res.redirect('/', { shortURL: shortURL });
+    res.redirect('/');
 })
 
 app.listen(process.env.PORT || 5000);
